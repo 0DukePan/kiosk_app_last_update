@@ -7,6 +7,7 @@ import '../Theme/colors.dart';
 import '../Models/menu_item.dart'; // Import MenuItem model
 import '../Services/api_service.dart'; // Import ApiService
 import 'dart:async'; // Import for Future
+import 'package:shimmer/shimmer.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -405,19 +406,172 @@ class _HomePageState extends State<HomePage> {
                       if (pageIndex == currentIndex) {
                           // Display loading, error, or items based on state
                           if (_isLoading) {
-                             return Center(child: CircularProgressIndicator());
+                             return Center(
+                               child: Column(
+                                 mainAxisAlignment: MainAxisAlignment.center,
+                                 children: [
+                                   // Loading text with animation
+                                   FadedSlideAnimation(
+                                     child: Text(
+                                       "Loading delicious items...",
+                                       style: Theme.of(context)
+                                           .textTheme
+                                           .titleMedium!
+                                           .copyWith(
+                                             fontSize: 16,
+                                             color: Colors.grey[600],
+                                           ),
+                                     ),
+                                     beginOffset: Offset(0.0, 0.3),
+                                     endOffset: Offset(0, 0),
+                                     slideCurve: Curves.linearToEaseOut,
+                                   ),
+                                   SizedBox(height: 24),
+                                   // Shimmer loading grid
+                                   Shimmer.fromColors(
+                                     baseColor: Colors.grey[300]!,
+                                     highlightColor: Colors.grey[100]!,
+                                     child: GridView.builder(
+                                       shrinkWrap: true,
+                                       physics: NeverScrollableScrollPhysics(),
+                                       padding: EdgeInsetsDirectional.only(
+                                         top: 6,
+                                         bottom: 100,
+                                         start: 16,
+                                         end: 32,
+                                       ),
+                                       itemCount: 4, // Show 4 shimmer items
+                                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                                         crossAxisCount: 2,
+                                         crossAxisSpacing: 16,
+                                         mainAxisSpacing: 16,
+                                         childAspectRatio: 0.75,
+                                       ),
+                                       itemBuilder: (context, index) {
+                                         return Container(
+                                           decoration: BoxDecoration(
+                                             borderRadius: BorderRadius.circular(10),
+                                             color: Colors.white,
+                                           ),
+                                           child: Column(
+                                             crossAxisAlignment: CrossAxisAlignment.start,
+                                             children: [
+                                               Expanded(
+                                                 flex: 35,
+                                                 child: Container(
+                                                   decoration: BoxDecoration(
+                                                     borderRadius: BorderRadius.vertical(
+                                                       top: Radius.circular(10),
+                                                     ),
+                                                     color: Colors.white,
+                                                   ),
+                                                 ),
+                                               ),
+                                               Spacer(flex: 5),
+                                               Padding(
+                                                 padding: const EdgeInsets.symmetric(
+                                                   horizontal: 8.0,
+                                                 ),
+                                                 child: Container(
+                                                   height: 16,
+                                                   width: 120,
+                                                   color: Colors.white,
+                                                 ),
+                                               ),
+                                               Spacer(flex: 4),
+                                               Padding(
+                                                 padding: const EdgeInsets.symmetric(
+                                                   horizontal: 8.0,
+                                                 ),
+                                                 child: Row(
+                                                   children: [
+                                                     Container(
+                                                       height: 16,
+                                                       width: 16,
+                                                       color: Colors.white,
+                                                     ),
+                                                     SizedBox(width: 8),
+                                                     Container(
+                                                       height: 16,
+                                                       width: 60,
+                                                       color: Colors.white,
+                                                     ),
+                                                   ],
+                                                 ),
+                                               ),
+                                               Spacer(flex: 5),
+                                             ],
+                                           ),
+                                         );
+                                       },
+                                     ),
+                                   ),
+                                 ],
+                               ),
+                             );
                           }
                           if (_errorMessage != null) {
-                             return Center(child: Text("Error: $_errorMessage", style: TextStyle(color: Colors.red)));
+                             return Center(
+                               child: Column(
+                                 mainAxisAlignment: MainAxisAlignment.center,
+                                 children: [
+                                   Icon(
+                                     Icons.error_outline,
+                                     size: 60,
+                                     color: Colors.red[400],
+                                   ),
+                                   SizedBox(height: 16),
+                                   Text(
+                                     "Error: $_errorMessage",
+                                     style: Theme.of(context)
+                                         .textTheme
+                                         .titleMedium!
+                                         .copyWith(
+                                           fontSize: 16,
+                                           color: Colors.red[600],
+                                         ),
+                                     textAlign: TextAlign.center,
+                                   ),
+                                 ],
+                               ),
+                             );
                           }
                           if (_displayedItems.isEmpty) {
-                             return Center(child: Text("No items available in this category."));
+                             return Center(
+                               child: Column(
+                                 mainAxisAlignment: MainAxisAlignment.center,
+                                 children: [
+                                   Icon(
+                                     Icons.search_off,
+                                     size: 60,
+                                     color: Colors.grey[400],
+                                   ),
+                                   SizedBox(height: 16),
+                                   Text(
+                                     "No items available in this category",
+                                     style: Theme.of(context)
+                                         .textTheme
+                                         .titleMedium!
+                                         .copyWith(
+                                           fontSize: 16,
+                                           color: Colors.grey[600],
+                                         ),
+                                   ),
+                                 ],
+                               ),
+                             );
                           }
                           // Render the grid if we have items
                           return buildItemGrid(_displayedItems);
                       } else {
-                          // For pages not currently selected, maybe show placeholder or nothing
-                          return Center(child: CircularProgressIndicator()); // Show loading while swiping? Or SizedBox.shrink();
+                          // For pages not currently selected, show a simple loading state
+                          return Center(
+                            child: CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Theme.of(context).primaryColor,
+                              ),
+                            ),
+                          );
                       }
                     }
                   ),
